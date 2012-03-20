@@ -38,3 +38,8 @@ func deleteDB(args []string, w http.ResponseWriter, req *http.Request) {
 		emitError("not_found", err.Error(), w)
 	}
 }
+
+func dbChanges(args []string, w http.ResponseWriter, req *http.Request) {
+	w.WriteHeader(404)
+	emitError("not_implemented", "Not supporting changes yet.", w)
+}

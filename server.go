@@ -22,9 +22,10 @@ var routingTable []routingEntry = []routingEntry{
 	routingEntry{"GET", regexp.MustCompile("^/$"), serverInfo},
 	routingEntry{"GET", regexp.MustCompile("^/_all_dbs$"), listDatabases},
 	routingEntry{"GET", regexp.MustCompile("^/_(.*)"), reservedHandler},
-	routingEntry{"GET", regexp.MustCompile("^/([-/+()$_a-z0-9]+)"), dbInfo},
-	routingEntry{"PUT", regexp.MustCompile("^/([-/+()$_a-z0-9]+)"), createDB},
-	routingEntry{"DELETE", regexp.MustCompile("^/([-/+()$_a-z0-9]+)"), deleteDB},
+	routingEntry{"GET", regexp.MustCompile("^/([-%+()$_a-z0-9]+)/?$"), dbInfo},
+	routingEntry{"GET", regexp.MustCompile("^/([-%+()$_a-z0-9]+)/_changes$"), dbChanges},
+	routingEntry{"PUT", regexp.MustCompile("^/([-%+()$_a-z0-9]+)/?$"), createDB},
+	routingEntry{"DELETE", regexp.MustCompile("^/([-%+()$_a-z0-9]+)/?$"), deleteDB},
 }
 
 var databases map[string]Database

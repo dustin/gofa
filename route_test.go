@@ -16,6 +16,11 @@ var routeExemplars = []sample{
 	sample{"GET", "/", serverInfo, []string{}},
 	sample{"GET", "/_all_dbs", listDatabases, []string{}},
 	sample{"GET", "/_busy", reservedHandler, []string{"busy"}},
+	sample{"GET", "/mydatabase/", dbInfo, []string{"mydatabase"}},
+	sample{"PUT", "/mydatabase/", createDB, []string{"mydatabase"}},
+	sample{"DELETE", "/mydatabase/", deleteDB, []string{"mydatabase"}},
+	sample{"GET", "/mydatabase/_changes", dbChanges, []string{"mydatabase"}},
+	// Spec says you can't do this, but CouchDB supports it.
 	sample{"GET", "/mydatabase", dbInfo, []string{"mydatabase"}},
 	sample{"PUT", "/mydatabase", createDB, []string{"mydatabase"}},
 	sample{"DELETE", "/mydatabase", deleteDB, []string{"mydatabase"}},
