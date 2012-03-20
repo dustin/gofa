@@ -18,14 +18,17 @@ type routingEntry struct {
 	Handler routeHandler
 }
 
+const dbMatch = "[-%+()$_a-z0-9]+"
+
 var routingTable []routingEntry = []routingEntry{
 	routingEntry{"GET", regexp.MustCompile("^/$"), serverInfo},
+	// Database stuff
 	routingEntry{"GET", regexp.MustCompile("^/_all_dbs$"), listDatabases},
 	routingEntry{"GET", regexp.MustCompile("^/_(.*)"), reservedHandler},
-	routingEntry{"GET", regexp.MustCompile("^/([-%+()$_a-z0-9]+)/?$"), dbInfo},
-	routingEntry{"GET", regexp.MustCompile("^/([-%+()$_a-z0-9]+)/_changes$"), dbChanges},
-	routingEntry{"PUT", regexp.MustCompile("^/([-%+()$_a-z0-9]+)/?$"), createDB},
-	routingEntry{"DELETE", regexp.MustCompile("^/([-%+()$_a-z0-9]+)/?$"), deleteDB},
+	routingEntry{"GET", regexp.MustCompile("^/(" + dbMatch + ")/?$"), dbInfo},
+	routingEntry{"GET", regexp.MustCompile("^/(" + dbMatch + ")/_changes$"), dbChanges},
+	routingEntry{"PUT", regexp.MustCompile("^/(" + dbMatch + ")/?$"), createDB},
+	routingEntry{"DELETE", regexp.MustCompile("^/(" + dbMatch + ")/?$"), deleteDB},
 }
 
 var databases map[string]Database
