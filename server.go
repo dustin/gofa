@@ -26,9 +26,13 @@ var routingTable []routingEntry = []routingEntry{
 	routingEntry{"GET", regexp.MustCompile("^/_all_dbs$"), listDatabases},
 	routingEntry{"GET", regexp.MustCompile("^/_(.*)"), reservedHandler},
 	routingEntry{"GET", regexp.MustCompile("^/(" + dbMatch + ")/?$"), dbInfo},
+	routingEntry{"HEAD", regexp.MustCompile("^/(" + dbMatch + ")/?$"), checkDB},
 	routingEntry{"GET", regexp.MustCompile("^/(" + dbMatch + ")/_changes$"), dbChanges},
 	routingEntry{"PUT", regexp.MustCompile("^/(" + dbMatch + ")/?$"), createDB},
 	routingEntry{"DELETE", regexp.MustCompile("^/(" + dbMatch + ")/?$"), deleteDB},
+	// Document stuff
+	routingEntry{"PUT", regexp.MustCompile("^/(" + dbMatch + ")/([^/]+)$"), putDocument},
+	routingEntry{"GET", regexp.MustCompile("^/(" + dbMatch + ")/([^/]+)$"), getDocument},
 }
 
 var databases map[string]Database
@@ -42,7 +46,7 @@ func makeDatabase(name string) error {
 	if _, found := databases[name]; found {
 		return errors.New("Database is already present.")
 	}
-	databases[name] = &MemoryDatabase{name: name}
+	databases[name] = &MemoryDatabase{name: name, docs: make(map[string]*Document)}
 	return nil
 }
 
@@ -52,6 +56,10 @@ func destroyDatabase(name string) error {
 	}
 	delete(databases, name)
 	return nil
+}
+
+func getDatabase(name string) Database {
+	return databases[name]
 }
 
 func mustEncode(w http.ResponseWriter, ob interface{}) {
@@ -114,6 +122,7 @@ func findHandler(method, path string) (routingEntry, []string) {
 func handler(w http.ResponseWriter, req *http.Request) {
 	defer req.Body.Close()
 	route, hparts := findHandler(req.Method, req.URL.Path)
+	log.Printf("Handling %v:%v", req.Method, req.URL.Path)
 	route.Handler(hparts, w, req)
 }
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 )
 
@@ -20,6 +21,13 @@ type Document struct {
 	Attachments map[string]Attachment
 }
 
+func (d *Document) MarshalJSON() ([]byte, error) {
+	m := d.Body
+	m["_id"] = d.Id
+	m["_rev"] = d.Rev
+	return json.Marshal(m)
+}
+
 type DBInfo struct {
 	Name          string `json:"db_name"`
 	Compacting    bool   `json:"compact_running"`
@@ -33,7 +41,7 @@ type DBInfo struct {
 }
 
 type Database interface {
-	GetDocument(id string) (Document, error)
-	CreateDocument(doc Document) (Revision, error)
+	GetDocument(id string) (*Document, error)
+	CreateDocument(doc *Document) (Revision, error)
 	GetInfo() (DBInfo, error)
 }

@@ -19,6 +19,15 @@ func dbInfo(args []string, w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func checkDB(args []string, w http.ResponseWriter, req *http.Request) {
+	dbname := args[0]
+	if _, ok := databases[dbname]; ok {
+		w.WriteHeader(200)
+	} else {
+		w.WriteHeader(404)
+	}
+}
+
 func createDB(args []string, w http.ResponseWriter, req *http.Request) {
 	err := makeDatabase(args[0])
 	if err == nil {

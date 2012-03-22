@@ -24,6 +24,8 @@ var routeExemplars = []sample{
 	sample{"GET", "/mydatabase", dbInfo, []string{"mydatabase"}},
 	sample{"PUT", "/mydatabase", createDB, []string{"mydatabase"}},
 	sample{"DELETE", "/mydatabase", deleteDB, []string{"mydatabase"}},
+	// Matching document stuff
+	sample{"PUT", "/mydatabase/myid", putDocument, []string{"mydatabase", "myid"}},
 }
 
 func stringyEquals(a, b interface{}) bool {
