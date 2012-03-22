@@ -33,6 +33,7 @@ var routingTable []routingEntry = []routingEntry{
 	// Document stuff
 	routingEntry{"PUT", regexp.MustCompile("^/(" + dbMatch + ")/([^/]+)$"), putDocument},
 	routingEntry{"GET", regexp.MustCompile("^/(" + dbMatch + ")/([^/]+)$"), getDocument},
+	routingEntry{"DELETE", regexp.MustCompile("^/(" + dbMatch + ")/([^/]+)$"), rmDocument},
 }
 
 var databases map[string]Database
@@ -62,17 +63,19 @@ func getDatabase(name string) Database {
 	return databases[name]
 }
 
-func mustEncode(w http.ResponseWriter, ob interface{}) {
-	e := json.NewEncoder(w)
-	err := e.Encode(ob)
+func mustEncode(status int, w http.ResponseWriter, ob interface{}) {
+	b, err := json.Marshal(ob)
 	if err != nil {
 		log.Fatalf("Error encoding %v.", ob)
 	}
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(b)))
+	w.WriteHeader(status)
+	w.Write(b)
 }
 
-func emitError(e, reason string, w http.ResponseWriter) {
+func emitError(status int, e, reason string, w http.ResponseWriter) {
 	m := map[string]string{"error": e, "reason": reason}
-	mustEncode(w, m)
+	mustEncode(status, w, m)
 }
 
 func listDatabases(parts []string, w http.ResponseWriter, req *http.Request) {
@@ -81,12 +84,11 @@ func listDatabases(parts []string, w http.ResponseWriter, req *http.Request) {
 		l = append(l, k)
 	}
 
-	mustEncode(w, l)
+	mustEncode(200, w, l)
 }
 
 func reservedHandler(parts []string, w http.ResponseWriter, req *http.Request) {
-	w.WriteHeader(400)
-	emitError("illegal_database_name",
+	emitError(400, "illegal_database_name",
 		"Only lowercase characters (a-z), digits (0-9), "+
 			"and any of the characters _, $, (, ), +, -, and / are allowed. "+
 			"Must begin with a letter.",
@@ -97,12 +99,11 @@ func serverInfo(parts []string, w http.ResponseWriter, req *http.Request) {
 	sinfo := map[string]string{
 		"couchdb": "Welcome", "version": "gofa 0.0",
 	}
-	mustEncode(w, sinfo)
+	mustEncode(200, w, sinfo)
 }
 
 func defaultHandler(parts []string, w http.ResponseWriter, req *http.Request) {
-	w.WriteHeader(400)
-	emitError("no_handler",
+	emitError(400, "no_handler",
 		fmt.Sprintf("Can't handle %v to %v\n", req.Method, req.URL.Path),
 		w)
 }

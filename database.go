@@ -12,10 +12,9 @@ func dbInfo(args []string, w http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			log.Fatalf("Error getting DB info: %v", err)
 		}
-		mustEncode(w, info)
+		mustEncode(200, w, info)
 	} else {
-		w.WriteHeader(404)
-		emitError("not_found", "no_db_file", w)
+		emitError(404, "not_found", "no_db_file", w)
 	}
 }
 
@@ -33,22 +32,19 @@ func createDB(args []string, w http.ResponseWriter, req *http.Request) {
 	if err == nil {
 		w.WriteHeader(201)
 	} else {
-		w.WriteHeader(412)
-		emitError("file_exists", err.Error(), w)
+		emitError(412, "file_exists", err.Error(), w)
 	}
 }
 
 func deleteDB(args []string, w http.ResponseWriter, req *http.Request) {
 	err := destroyDatabase(args[0])
 	if err == nil {
-		mustEncode(w, map[string]interface{}{"ok": true})
+		mustEncode(200, w, map[string]interface{}{"ok": true})
 	} else {
-		w.WriteHeader(412)
-		emitError("not_found", err.Error(), w)
+		emitError(412, "not_found", err.Error(), w)
 	}
 }
 
 func dbChanges(args []string, w http.ResponseWriter, req *http.Request) {
-	w.WriteHeader(404)
-	emitError("not_implemented", "Not supporting changes yet.", w)
+	emitError(404, "not_implemented", "Not supporting changes yet.", w)
 }

@@ -43,5 +43,6 @@ type DBInfo struct {
 type Database interface {
 	GetDocument(id string) (*Document, error)
 	CreateDocument(doc *Document) (Revision, error)
+	DeleteDocument(id string, rev Revision) error
 	GetInfo() (DBInfo, error)
 }
