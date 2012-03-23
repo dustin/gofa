@@ -73,7 +73,7 @@ func mustEncode(status int, w http.ResponseWriter, ob interface{}) {
 	w.Write(b)
 }
 
-func emitError(status int, e, reason string, w http.ResponseWriter) {
+func emitError(status int, w http.ResponseWriter, e, reason string) {
 	m := map[string]string{"error": e, "reason": reason}
 	mustEncode(status, w, m)
 }
@@ -88,11 +88,13 @@ func listDatabases(parts []string, w http.ResponseWriter, req *http.Request) {
 }
 
 func reservedHandler(parts []string, w http.ResponseWriter, req *http.Request) {
-	emitError(400, "illegal_database_name",
+	emitError(400,
+
+		w, "illegal_database_name",
 		"Only lowercase characters (a-z), digits (0-9), "+
 			"and any of the characters _, $, (, ), +, -, and / are allowed. "+
-			"Must begin with a letter.",
-		w)
+			"Must begin with a letter.")
+
 }
 
 func serverInfo(parts []string, w http.ResponseWriter, req *http.Request) {
@@ -103,9 +105,11 @@ func serverInfo(parts []string, w http.ResponseWriter, req *http.Request) {
 }
 
 func defaultHandler(parts []string, w http.ResponseWriter, req *http.Request) {
-	emitError(400, "no_handler",
-		fmt.Sprintf("Can't handle %v to %v\n", req.Method, req.URL.Path),
-		w)
+	emitError(400,
+
+		w, "no_handler",
+		fmt.Sprintf("Can't handle %v to %v\n", req.Method, req.URL.Path))
+
 }
 
 func findHandler(method, path string) (routingEntry, []string) {

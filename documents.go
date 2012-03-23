@@ -33,7 +33,7 @@ func putDocument(args []string, w http.ResponseWriter, req *http.Request) {
 	d := json.NewDecoder(req.Body)
 	err := d.Decode(&doc.Body)
 	if err != nil {
-		emitError(400, "decode", "Error decoding: "+err.Error(), w)
+		emitError(400, w, "decode", "Error decoding: "+err.Error())
 		return
 	}
 
@@ -44,12 +44,12 @@ func putDocument(args []string, w http.ResponseWriter, req *http.Request) {
 
 	db := getDatabase(dbname)
 	if db == nil {
-		emitError(400, "no_db", "No such DB: "+dbname, w)
+		emitError(400, w, "no_db", "No such DB: "+dbname)
 		return
 	}
 	rev, err := db.CreateDocument(&doc)
 	if err != nil {
-		emitError(400, "generic", err.Error(), w)
+		emitError(400, w, "generic", err.Error())
 		return
 	}
 	mustEncode(200, w, map[string]interface{}{"ok": true,
@@ -64,12 +64,12 @@ func getDocument(args []string, w http.ResponseWriter, req *http.Request) {
 	db := getDatabase(dbname)
 	w.Header().Set("Content-Type", "application/json")
 	if db == nil {
-		emitError(400, "no_db", "No such DB: "+dbname, w)
+		emitError(400, w, "no_db", "No such DB: "+dbname)
 		return
 	}
 	doc, err := db.GetDocument(docid)
 	if err != nil {
-		emitError(400, "generic", err.Error(), w)
+		emitError(400, w, "generic", err.Error())
 		return
 	}
 	mustEncode(200, w, &doc)
@@ -81,7 +81,7 @@ func rmDocument(args []string, w http.ResponseWriter, req *http.Request) {
 	db := getDatabase(dbname)
 	w.Header().Set("Content-Type", "application/json")
 	if db == nil {
-		emitError(400, "no_db", "No such DB: "+dbname, w)
+		emitError(400, w, "no_db", "No such DB: "+dbname)
 		return
 	}
 
@@ -89,7 +89,7 @@ func rmDocument(args []string, w http.ResponseWriter, req *http.Request) {
 
 	err := db.DeleteDocument(docid, rev)
 	if err != nil {
-		emitError(400, "generic", err.Error(), w)
+		emitError(400, w, "generic", err.Error())
 		return
 	}
 	mustEncode(200, w, map[string]interface{}{
