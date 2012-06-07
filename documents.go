@@ -11,7 +11,7 @@ func getRequestRev(req *http.Request) Revision {
 	if revstr == "" {
 		revstr = req.Header.Get("If-Match")
 		if revstr != "" {
-			revstr = revstr[1:-1]
+			revstr = revstr[1 : len(revstr)-1]
 		}
 	}
 	return Revision(revstr)
